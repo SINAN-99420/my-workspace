@@ -1,11 +1,21 @@
+import os
+import dj_database_url
 from pathlib import Path
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-local-dev-only-change-me"
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+# ── 🔐 SECURITY SETTINGS (Production Ready) ──
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-local-dev-only-change-me")
 
+# ലോക്കലിൽ DEBUG True ആയിരിക്കും, റെൻഡറിൽ False ആക്കാൻ ഇത് സഹായിക്കും
+DEBUG = os.environ.get("DEBUG", "True") == "True"
+
+# എല്ലാ ഹോസ്റ്റുകളെയും അനുവദിക്കാൻ (Render-ന് വേണ്ടി)
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+
+
+# ── 📦 APPLICATIONS ──
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -19,8 +29,10 @@ INSTALLED_APPS = [
     # add future apps here: "calendar", "todos", ...
 ]
 
+# ── 🛡️ MIDDLEWARE (WhiteNoise added for Static Files) ──
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # <-- പുതിയത്: CSS/JS ലോഡ് ആകാൻ
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -46,11 +58,15 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+
+# ── 🗄️ DATABASE (PostgreSQL for Production, SQLite for Local) ──
+# ലോക്കലിൽ SQLite ഉം, ലൈവിൽ DATABASE_URL ഉണ്ടെങ്കിൽ PostgreSQL ഉം ഓട്ടോമാറ്റിക് ആയി തിരഞ്ഞെടുക്കും
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default="sqlite:///" + str(BASE_DIR / "db.sqlite3"),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = []
@@ -60,7 +76,13 @@ TIME_ZONE = "Asia/Kolkata"
 USE_I18N = True
 USE_TZ = True
 
+
+# ── 🎨 STATIC FILES (CSS, JavaScript, Images) ──
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# WhiteNoise ഉപയോഗിച്ച് ലൈവിൽ സ്റ്റാറ്റിക് ഫയലുകൾ ശേഖരിക്കാനും കംപ്രസ് ചെയ്യാനും
+STATIC_ROOT = BASE_DIR / "staticfiles" 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
