@@ -1,0 +1,50 @@
+<form id="note-editor-form" class="editor-form"
+      hx-post="/notes/{{ note.pk }}/update/"
+      hx-trigger="content-updated" 
+      hx-target="#notes-list"
+      hx-swap="outerHTML">
+  
+  <!-- Toolbar -->
+  <div class="editor-toolbar">
+    <div class="toolbar-group">
+      <button type="button" class="tool-btn" data-command="bold" title="Bold">
+        <span class="material-symbols-outlined">format_bold</span>
+      </button>
+      <button type="button" class="tool-btn" data-command="italic" title="Italic">
+        <span class="material-symbols-outlined">format_italic</span>
+      </button>
+      <button type="button" class="tool-btn" data-command="underline" title="Underline">
+        <span class="material-symbols-outlined">format_underlined</span>
+      </button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="tool-btn" data-zoom="1" title="Zoom In">
+        <span class="material-symbols-outlined">zoom_in</span>
+      </button>
+      <button type="button" class="tool-btn" data-zoom="-1" title="Zoom Out">
+        <span class="material-symbols-outlined">zoom_out</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="editor-area">
+    <input name="title" value="{{ note.title }}" placeholder="Title" autocomplete="off" id="note-title" />
+    
+    <input type="hidden" name="content" id="note-content-hidden" value="{{ note.content }}">
+    
+    <!-- ഇവിടെയാണ് നിങ്ങൾ എഴുതുന്നത് -->
+    <div id="note-content" class="editor-content" contenteditable="true" oninput="syncContent()" onkeyup="updateStatus()" onclick="updateStatus()">{{ note.content|safe }}</div>
+  </div>
+
+  <div class="editor-status-bar">
+    <div class="status-left">
+      <span id="word-count">0 words</span>
+      <span id="char-count">0 chars</span>
+    </div>
+    <div class="status-right">
+      <span class="material-symbols-outlined" style="font-size: 16px;">cloud_done</span>
+      <span>Auto-Saved</span>
+    </div>
+  </div>
+</form>

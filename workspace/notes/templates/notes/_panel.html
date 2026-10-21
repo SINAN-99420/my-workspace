@@ -1,0 +1,8 @@
+{% include "notes/_list.html" %}
+<section id="editor" class="notes-editor">
+  {% if selected %}
+    {% include "notes/_editor.html" with note=selected %}
+  {% else %}
+    <div class="notes-editor-placeholder">Select a note or create a new one.</div>
+  {% endif %}
+</section>

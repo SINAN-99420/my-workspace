@@ -1,0 +1,42 @@
+<aside id="notes-list" class="notes-list">
+  <div class="notes-list-head">
+    <h2 class="notes-list-title">All notes</h2>
+    <button class="btn btn-primary btn-sm"
+            hx-post="/notes/create/"
+            hx-target="#notes-panel"
+            hx-swap="innerHTML">
+      <span class="material-symbols-outlined">add</span>
+      <span>New</span>
+    </button>
+  </div>
+
+  <ul class="plain notes-items">
+    {% for note in notes %}
+      <li id="note-{{ note.pk }}"
+          class="notes-item {% if selected and selected.pk == note.pk %}active{% endif %}">
+        <a class="notes-item-link"
+           hx-get="/notes/{{ note.pk }}/"
+           hx-target="#editor"
+           hx-swap="innerHTML">
+          <span class="notes-item-title">
+            {% if note.is_pinned %}
+              <span class="material-symbols-outlined pin-icon">push_pin</span>
+            {% endif %}
+            <span>{{ note.title|default:"Untitled" }}</span>
+          </span>
+          <span class="notes-item-meta">{{ note.updated_at|date:"M j · H:i" }}</span>
+        </a>
+        <button class="icon-btn"
+                hx-post="/notes/{{ note.pk }}/delete/"
+                hx-target="#notes-panel"
+                hx-swap="innerHTML"
+                hx-confirm="Delete this note?"
+                aria-label="Delete note">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+      </li>
+    {% empty %}
+      <li class="notes-empty">No notes yet.</li>
+    {% endfor %}
+  </ul>
+</aside>

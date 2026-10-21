@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Workspace{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("theme") === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      } catch (err) { /* ignore */ }
+    })();
+  </script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+  <!-- 🌊 Animated Waves Background -->
+  <div class="wave-container">
+    <div class="wave-bg"></div>
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+      <defs>
+        <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+      </defs>
+      <g class="parallax">
+        <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(0, 119, 255, 0.15)" />
+        <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(0, 119, 255, 0.3)" />
+        <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(0, 85, 200, 0.5)" />
+        <use xlink:href="#gentle-wave" x="48" y="7" fill="#03102b" />
+      </g>
+    </svg>
+  </div>
+
+  <!-- 🌟 Glassy Sliding Navbar -->
+  <header class="topnav">
+    <div class="topnav-inner">
+      <a href="/" class="brand">
+        <span class="brand-badge material-symbols-outlined">blur_on</span>
+        <span class="brand-text">
+          <span class="brand-title">Workspace</span>
+        </span>
+      </a>
+
+      <nav class="topnav-nav" id="main-nav" aria-label="Primary">
+        <div class="nav-indicator"></div> 
+        
+        <a href="/" class="topnav-item {% if request.path == '/' %}active{% endif %}" 
+           hx-get="/" hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true">
+          <span class="material-symbols-outlined topnav-icon">space_dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        
+        <a href="/notes/" class="topnav-item {% if '/notes' in request.path %}active{% endif %}" 
+           hx-get="/notes/" hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true">
+          <span class="material-symbols-outlined topnav-icon">edit_note</span>
+          <span>Notes</span>
+        </a>
+      </nav>
+
+      <div class="topnav-right">
+        <button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+          <span class="knob"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content" id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- 🧠 GLOBAL JAVASCRIPT LOGIC -->
+  <script>
+    // 1. Theme Toggle
+    function toggleTheme() {
+      var root = document.documentElement;
+      var isLight = root.getAttribute("data-theme") === "light";
+      if (isLight) { root.removeAttribute("data-theme"); } else { root.setAttribute("data-theme", "light"); }
+      try { localStorage.setItem("theme", isLight ? "dark" : "light"); } catch (err) {}
+    }
+
+    // 2. Navbar Sliding Pill
+    function moveNavIndicator() {
+      var activeItem = document.querySelector('.topnav-item.active');
+      var indicator = document.querySelector('.nav-indicator');
+      if (activeItem && indicator) {
+        var navRect = activeItem.parentElement.getBoundingClientRect();
+        var itemRect = activeItem.getBoundingClientRect();
+        indicator.style.width = itemRect.width + 'px';
+        indicator.style.transform = 'translateX(' + (itemRect.left - navRect.left - 4) + 'px)';
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() { setTimeout(moveNavIndicator, 100); });
+    window.addEventListener('resize', moveNavIndicator);
+
+    // 3. HTMX Navigation Logic
+    document.body.addEventListener('htmx:afterSettle', function(evt) {
+      var currentPath = window.location.pathname;
+      document.querySelectorAll('.topnav-item').forEach(function(item) {
+        var href = item.getAttribute('href');
+        if (href === currentPath || (href !== '/' && currentPath.includes(href))) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+      moveNavIndicator();
+      
+      // എഡിറ്റർ ഉണ്ടെങ്കിൽ സ്റ്റാറ്റസ് അപ്ഡേറ്റ് ചെയ്യാൻ
+      if (document.getElementById('note-content')) {
+        updateStatus();
+      }
+    });
+
+    // Page Transition
+    document.body.addEventListener('htmx:beforeSwap', function(evt) {
+      if (evt.detail.target.id === 'main-content') {
+        evt.detail.target.style.opacity = '0';
+        evt.detail.target.style.transform = 'translateY(10px)';
+      }
+    });
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+      if (evt.detail.target.id === 'main-content') {
+        evt.detail.target.style.opacity = '1';
+        evt.detail.target.style.transform = 'translateY(0)';
+      }
+    });
+
+
+    // ── ✍️ EDITOR TOOLBAR LOGIC (Event Delegation) ──
+    let currentZoom = 16;
+    let saveTimeout = null;
+
+    // ബട്ടൺ ക്ലിക്ക് ചെയ്യുമ്പോൾ എഡിറ്ററിലെ കർസർ പോകാതിരിക്കാൻ
+    document.body.addEventListener('mousedown', function(e) {
+      if (e.target.closest('.tool-btn')) {
+        e.preventDefault(); 
+      }
+    });
+
+    // ടൂൾബാർ ബട്ടണുകൾ ക്ലിക്ക് ചെയ്യുമ്പോൾ
+    document.body.addEventListener('click', function(e) {
+      let btn = e.target.closest('.tool-btn');
+      if (!btn) return;
+
+      let command = btn.getAttribute('data-command');
+      let contentDiv = document.getElementById('note-content');
+
+      if (command && contentDiv) {
+        contentDiv.focus();
+        document.execCommand(command, false, null);
+        syncContent();
+      }
+
+      let zoom = btn.getAttribute('data-zoom');
+      if (zoom && contentDiv) {
+        currentZoom += (parseInt(zoom) * 2);
+        if (currentZoom < 12) currentZoom = 12;
+        if (currentZoom > 36) currentZoom = 36;
+        contentDiv.style.fontSize = currentZoom + 'px';
+      }
+    });
+
+    // എഡിറ്റർ കണ്ടന്റ് സിങ്ക് ചെയ്യാൻ
+    function syncContent() {
+      let contentDiv = document.getElementById('note-content');
+      let hiddenInput = document.getElementById('note-content-hidden');
+      let form = document.getElementById('note-editor-form');
+      
+      if (contentDiv && hiddenInput && form) {
+        hiddenInput.value = contentDiv.innerHTML;
+        
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          htmx.trigger(form, 'content-updated');
+        }, 700);
+        
+        updateStatus();
+      }
+    }
+
+    // വേഡ് കൗണ്ട് അപ്ഡേറ്റ് ചെയ്യാൻ
+    function updateStatus() {
+      let contentDiv = document.getElementById('note-content');
+      if (!contentDiv) return;
+
+      const text = contentDiv.innerText || "";
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      
+      let wordCountEl = document.getElementById('word-count');
+      let charCountEl = document.getElementById('char-count');
+      
+      if (wordCountEl) wordCountEl.textContent = words + ' words';
+      if (charCountEl) charCountEl.textContent = text.length + ' chars';
+    }
+  </script>
+</body>
+</html>
