@@ -1,14 +1,17 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Workspace{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=block" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=block"
+    rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/app.css' %}" />
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script>
@@ -21,12 +24,14 @@
     })();
   </script>
 </head>
+
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
   <!-- 🌊 Animated Waves Background -->
   <div class="wave-container">
     <div class="wave-bg"></div>
-    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+      viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
       <defs>
         <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
       </defs>
@@ -50,18 +55,24 @@
       </a>
 
       <nav class="topnav-nav" id="main-nav" aria-label="Primary">
-        <div class="nav-indicator"></div> 
-        
-        <a href="/" class="topnav-item {% if request.path == '/' %}active{% endif %}" 
-           hx-get="/" hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true">
+        <div class="nav-indicator"></div>
+
+        <a href="/" class="topnav-item {% if request.path == '/' %}active{% endif %}" hx-get="/"
+          hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true">
           <span class="material-symbols-outlined topnav-icon">space_dashboard</span>
           <span>Dashboard</span>
         </a>
-        
-        <a href="/notes/" class="topnav-item {% if '/notes' in request.path %}active{% endif %}" 
-           hx-get="/notes/" hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true">
+
+        <a href="/notes/" class="topnav-item {% if '/notes' in request.path %}active{% endif %}" hx-get="/notes/"
+          hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true">
           <span class="material-symbols-outlined topnav-icon">edit_note</span>
           <span>Notes</span>
+        </a>
+        <a href="/api-tester/" class="topnav-item {% if '/api-tester' in request.path %}active{% endif %}"
+          hx-get="/api-tester/" hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML"
+          hx-push-url="true">
+          <span class="material-symbols-outlined topnav-icon">api</span>
+          <span>API Tester</span>
         </a>
       </nav>
 
@@ -85,7 +96,7 @@
       var root = document.documentElement;
       var isLight = root.getAttribute("data-theme") === "light";
       if (isLight) { root.removeAttribute("data-theme"); } else { root.setAttribute("data-theme", "light"); }
-      try { localStorage.setItem("theme", isLight ? "dark" : "light"); } catch (err) {}
+      try { localStorage.setItem("theme", isLight ? "dark" : "light"); } catch (err) { }
     }
 
     // 2. Navbar Sliding Pill
@@ -100,13 +111,13 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function() { setTimeout(moveNavIndicator, 100); });
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(moveNavIndicator, 100); });
     window.addEventListener('resize', moveNavIndicator);
 
     // 3. HTMX Navigation Logic
-    document.body.addEventListener('htmx:afterSettle', function(evt) {
+    document.body.addEventListener('htmx:afterSettle', function (evt) {
       var currentPath = window.location.pathname;
-      document.querySelectorAll('.topnav-item').forEach(function(item) {
+      document.querySelectorAll('.topnav-item').forEach(function (item) {
         var href = item.getAttribute('href');
         if (href === currentPath || (href !== '/' && currentPath.includes(href))) {
           item.classList.add('active');
@@ -115,7 +126,7 @@
         }
       });
       moveNavIndicator();
-      
+
       // എഡിറ്റർ ഉണ്ടെങ്കിൽ സ്റ്റാറ്റസ് അപ്ഡേറ്റ് ചെയ്യാൻ
       if (document.getElementById('note-content')) {
         updateStatus();
@@ -123,13 +134,13 @@
     });
 
     // Page Transition
-    document.body.addEventListener('htmx:beforeSwap', function(evt) {
+    document.body.addEventListener('htmx:beforeSwap', function (evt) {
       if (evt.detail.target.id === 'main-content') {
         evt.detail.target.style.opacity = '0';
         evt.detail.target.style.transform = 'translateY(10px)';
       }
     });
-    document.body.addEventListener('htmx:afterSwap', function(evt) {
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
       if (evt.detail.target.id === 'main-content') {
         evt.detail.target.style.opacity = '1';
         evt.detail.target.style.transform = 'translateY(0)';
@@ -142,14 +153,14 @@
     let saveTimeout = null;
 
     // ബട്ടൺ ക്ലിക്ക് ചെയ്യുമ്പോൾ എഡിറ്ററിലെ കർസർ പോകാതിരിക്കാൻ
-    document.body.addEventListener('mousedown', function(e) {
+    document.body.addEventListener('mousedown', function (e) {
       if (e.target.closest('.tool-btn')) {
-        e.preventDefault(); 
+        e.preventDefault();
       }
     });
 
     // ടൂൾബാർ ബട്ടണുകൾ ക്ലിക്ക് ചെയ്യുമ്പോൾ
-    document.body.addEventListener('click', function(e) {
+    document.body.addEventListener('click', function (e) {
       let btn = e.target.closest('.tool-btn');
       if (!btn) return;
 
@@ -176,15 +187,15 @@
       let contentDiv = document.getElementById('note-content');
       let hiddenInput = document.getElementById('note-content-hidden');
       let form = document.getElementById('note-editor-form');
-      
+
       if (contentDiv && hiddenInput && form) {
         hiddenInput.value = contentDiv.innerHTML;
-        
+
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
           htmx.trigger(form, 'content-updated');
         }, 700);
-        
+
         updateStatus();
       }
     }
@@ -196,13 +207,14 @@
 
       const text = contentDiv.innerText || "";
       const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      
+
       let wordCountEl = document.getElementById('word-count');
       let charCountEl = document.getElementById('char-count');
-      
+
       if (wordCountEl) wordCountEl.textContent = words + ' words';
       if (charCountEl) charCountEl.textContent = text.length + ' chars';
     }
   </script>
 </body>
+
 </html>

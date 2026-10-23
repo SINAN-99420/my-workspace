@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     # local apps
     "core",
     "notes",
+    "api_tester",
     # add future apps here: "calendar", "todos", ...
 ]
 

@@ -1,0 +1,16 @@
+{% if success %}
+  <div class="response-header">
+    <span class="status-badge {% if status_code < 400 %}success{% else %}danger{% endif %}">
+      {{ status_code }}
+    </span>
+    <span class="time-badge">{{ time_taken }}</span>
+  </div>
+  <pre class="code-block"><code>{{ response }}</code></pre>
+{% else %}
+  <div class="response-header">
+    <span class="status-badge danger">Error</span>
+  </div>
+  <div class="code-block error-text">
+    {{ error }}
+  </div>
+{% endif %}

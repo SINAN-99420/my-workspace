@@ -388,3 +388,119 @@ button.icon-btn .material-symbols-outlined { font-size: 20px; }
   text-decoration-color: var(--primary); 
   text-decoration-thickness: 2px; 
 }
+
+/* ── 🚀 API TESTER MODULE ── */
+.api-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  height: calc(100vh - 200px);
+}
+
+.api-panel {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.method-select {
+  width: 100px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  padding: 10px;
+}
+
+.url-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  outline: none;
+}
+.url-input:focus { border-color: var(--primary); }
+
+.api-details {
+  margin-top: 16px;
+  color: var(--text-1);
+  font-size: 13px;
+  cursor: pointer;
+}
+.api-details summary { margin-bottom: 8px; }
+
+.api-textarea {
+  width: 100%;
+  height: 120px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: monospace;
+  font-size: 13px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+.response-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 12px;
+}
+.status-badge.success { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.status-badge.danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+.time-badge {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-1);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.code-block {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  color: #c9d1d9;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow: auto;
+  flex: 1;
+  margin: 0;
+}
+
+.error-text { color: #ff7b72; }
+.empty-response {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .api-grid { grid-template-columns: 1fr; height: auto; }
+  .api-panel { height: 400px; }
+}

@@ -1,0 +1,64 @@
+{% extends "core/base.html" %}
+{% block title %}API Tester · Workspace{% endblock %}
+{% block content %}
+
+<div class="api-container">
+  <div class="page-head" style="text-align: left; margin-bottom: 20px;">
+    <h1 class="page-title" style="font-size: 36px;">API Tester</h1>
+    <p class="page-sub" style="text-transform: none; letter-spacing: 0;">Test your GET & POST APIs quickly.</p>
+  </div>
+
+  <div class="api-grid">
+    <!-- Request Panel -->
+    <div class="glass api-panel">
+      <form hx-post="/api-tester/test/" hx-target="#api-response" hx-swap="innerHTML" hx-indicator="#loading">
+        
+        <div class="input-group">
+          <select name="method" id="api-method" class="method-select" onchange="toggleBody()">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+          </select>
+          <input type="text" name="url" placeholder="https://api.example.com/data" required class="url-input">
+          <button type="submit" class="btn btn-primary">Send</button>
+        </div>
+
+        <!-- Headers (Optional) -->
+        <details class="api-details">
+          <summary>Headers (JSON)</summary>
+          <textarea name="headers" placeholder='{"Authorization": "Bearer token"}' class="api-textarea"></textarea>
+        </details>
+
+        <!-- POST Body (GET-ൽ ഇത് മറയും) -->
+        <div id="body-section" style="display: none;">
+          <label>Request Body (JSON)</label>
+          <textarea name="body" placeholder='{"name": "John", "age": 30}' class="api-textarea"></textarea>
+        </div>
+
+        <div id="loading" class="htmx-indicator" style="color: var(--primary); margin-top: 10px;">Sending request...</div>
+      </form>
+    </div>
+
+    <!-- Response Panel -->
+    <div class="glass api-panel">
+      <div id="api-response">
+        <div class="empty-response">
+          Response will appear here...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // GET തിരഞ്ഞെടുക്കുമ്പോൾ Body ടെക്സ്റ്റ് ഏരിയ മറയ്ക്കാൻ
+  function toggleBody() {
+    const method = document.getElementById('api-method').value;
+    const bodySection = document.getElementById('body-section');
+    if (method === 'POST') {
+      bodySection.style.display = 'block';
+    } else {
+      bodySection.style.display = 'none';
+    }
+  }
+</script>
+{% endblock %}
